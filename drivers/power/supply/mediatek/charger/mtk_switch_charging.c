@@ -211,8 +211,10 @@ static void swchg_select_charging_current_limit(struct charger_manager *info)
 					info->data.usb_charger_current;
 		}
 	} else if (info->chr_type == NONSTANDARD_CHARGER) {
-		pdata->input_current_limit =
-				info->data.non_std_ac_charger_current;
+		//pdata->input_current_limit =
+		//		info->data.non_std_ac_charger_current;
+		//for 5V wireless vbus input limit
+		pdata->input_current_limit = 1100000;
 		pdata->charging_current_limit =
 				info->data.non_std_ac_charger_current;
 	} else if (info->chr_type == STANDARD_CHARGER) {

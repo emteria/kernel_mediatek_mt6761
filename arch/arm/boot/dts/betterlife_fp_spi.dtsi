@@ -1,0 +1,13 @@
+//blestech add
+&spi1{
+	#address-cells = <1>;
+	#size-cells = <0>;
+
+	betterlife-spi@{
+		compatible = "betterlife,spi";	
+		reg = <0x0>;
+		spi-max-frequency = <0x10000000>;
+		status = "okay";
+	};
+};
+//blestech end

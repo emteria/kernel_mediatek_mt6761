@@ -98,7 +98,7 @@
 };
 /* TOUCH start */
 &touch {
-	tpd-resolution = <1080 1920>;
+	tpd-resolution = <720 1280>;
 	use-tpd-button = <0>;
 	tpd-key-num = <3>;
 	tpd-key-local= <139 172 158 0>;
@@ -160,43 +160,7 @@
 };
 /* TOUCH end */
 
-/* CONSYS GPIO standardization */
-&pio {
-	consys_pins_default: consys_default {
-	};
-	gpslna_pins_init: gpslna@0 {
-		pins_cmd_dat {
-			pinmux = <PINMUX_GPIO91__FUNC_GPIO91>;
-			slew-rate = <0>;
-			bias-disable;
-			output-low;
-		};
-	};
-	gpslna_pins_oh: gpslna@1 {
-		pins_cmd_dat {
-			pinmux = <PINMUX_GPIO91__FUNC_GPIO91>;
-			slew-rate = <1>;
-			output-high;
-		};
-	};
-	gpslna_pins_ol: gpslna@2 {
-		pins_cmd_dat {
-			pinmux = <PINMUX_GPIO91__FUNC_GPIO91>;
-			slew-rate = <1>;
-			output-low;
-		};
-	};
-};
-&consys {
-	pinctrl-names = "default", "gps_lna_state_init",
-		"gps_lna_state_oh", "gps_lna_state_ol";
-	pinctrl-0 = <&consys_pins_default>;
-	pinctrl-1 = <&gpslna_pins_init>;
-	pinctrl-2 = <&gpslna_pins_oh>;
-	pinctrl-3 = <&gpslna_pins_ol>;
-	status = "okay";
-};
-/* CONSYS end */
+
 
 /* accdet start */
 &accdet {
@@ -218,7 +182,7 @@
 	};
 	accdet_pins_eint_as_int: accdeteint@0 {
 		pins_cmd_dat {
-			pinmux = <PINMUX_GPIO9__FUNC_GPIO9>;
+			pinmux = <PINMUX_GPIO166__FUNC_GPIO166>;
 			slew-rate = <0>;
 			bias-disable;
 		};
@@ -226,46 +190,44 @@
 };
 /* accdet end */
 
-/* FINGERPRINT start */
-&spi0 {
-	#address-cells = <1>;
-	#size-cells = <0>;
-	fingerprint@0 {
-		compatible = "goodix,goodix-fp";
-		reg = <0>;
-		spi-max-frequency = <8000000>;
-		netlink-event = <30>;
+&mt6370_pmu {
+	mt6370,intr_gpio_num = <11>; /* direct defined GPIO num */
+	mt6370,intr_gpio = <&pio 11 0x0>;
+};
+
+&mt6370_typec {
+	mt6370pd,intr_gpio_num = <41>; /* direct defined GPIO num */
+	mt6370pd,intr_gpio = <&pio 41 0x0>;
+};
+
+&charger {
+	algorithm_name = "DualSwitchCharging";
+	chg1_ta_ac_charger_current = <2000000>;
+	chg2_ta_ac_charger_current = <2000000>;
+};
+
+&i2c3 {
+	rt9465@4b {
+		compatible = "richtek,rt9465";
+		reg = <0x4b>;
 		status = "okay";
+		rt,en_gpio_num = <176>;
+		rt,en_gpio = <&pio 176 0x0>;
+		rt,intr_gpio_num = <23>; /* direct defined GPIO num */
+		rt,intr_gpio = <&pio 23 0x0>;
+		interrupt-names = "wdtmri";
+		charger_name = "secondary_chg";
+		ichg = <1500000>; /* uA */
+		mivr = <4500000>; /* uV */
+		cv = <4550000>; /* uV */
+		ieoc = <700000>; /* uA */
+		safety_timer = <12>; /* hour */
+		en_st; /* safety timer */
+		/* en_te; */
+		en_wdt;
 	};
 };
 
-&goodix_fp {
-	pinctrl-names = "default", "reset_high", "reset_low";
-	pinctrl-0 = <&fingerprint_default>;
-	pinctrl-1 = <&fingerprint_reset_high>;
-	pinctrl-2 = <&fingerprint_reset_low>;
-	status = "okay";
-};
-
-&pio {
-	fingerprint_default: state_default {
-	};
-	fingerprint_reset_high: state_reset_high {
-		pins_cmd_dat {
-			pinmux = <PINMUX_GPIO172__FUNC_GPIO172>;
-			slew-rate = <1>;
-			output-high;
-		};
-	};
-	fingerprint_reset_low: state_reset_low {
-		pins_cmd_dat {
-			pinmux = <PINMUX_GPIO172__FUNC_GPIO172>;
-			slew-rate = <1>;
-			output-low;
-		};
-	};
-};
-/* FINGERPRINT end */
 
 /* IRTX GPIO end */
 &irtx_pwm {
@@ -294,7 +256,43 @@
 	};
 };
 /* IRTX GPIO Settings -End */
-
+/* CONSYS GPIO standardization */
+&pio {
+	consys_pins_default: consys_default {
+	};
+	gpslna_pins_init: gpslna@0 {
+		pins_cmd_dat {
+			pinmux = <PINMUX_GPIO171__FUNC_GPIO171>;
+			slew-rate = <0>;
+			bias-disable;
+			output-low;
+		};
+	};
+	gpslna_pins_oh: gpslna@1 {
+		pins_cmd_dat {
+			pinmux = <PINMUX_GPIO171__FUNC_GPIO171>;
+			slew-rate = <1>;
+			output-high;
+		};
+	};
+	gpslna_pins_ol: gpslna@2 {
+		pins_cmd_dat {
+			pinmux = <PINMUX_GPIO171__FUNC_GPIO171>;
+			slew-rate = <1>;
+			output-low;
+		};
+	};
+};
+&consys {
+	pinctrl-names = "default", "gps_lna_state_init",
+		"gps_lna_state_oh", "gps_lna_state_ol";
+	pinctrl-0 = <&consys_pins_default>;
+	pinctrl-1 = <&gpslna_pins_init>;
+	pinctrl-2 = <&gpslna_pins_oh>;
+	pinctrl-3 = <&gpslna_pins_ol>;
+	status = "okay";
+};
+/* CONSYS end */
 /* AUDIO GPIO standardization */
 &audgpio {
 	pinctrl-names = "aud_clk_mosi_off",
@@ -306,7 +304,9 @@
 			"aud_dat_miso_off",
 			"aud_dat_miso_on",
 			"aud_smartpa_off",
-			"aud_smartpa_on";
+			"aud_smartpa_on",
+			"extamp-pullhigh",
+			"extamp-pulllow";
 	pinctrl-0 = <&aud_clk_mosi_off>;
 	pinctrl-1 = <&aud_clk_mosi_on>;
 	pinctrl-2 = <&aud_clk_miso_off>;
@@ -317,6 +317,8 @@
 	pinctrl-7 = <&aud_dat_miso_on>;
 	pinctrl-8 = <&aud_pins_smartpa_off>;
 	pinctrl-9 = <&aud_pins_smartpa_on>;
+	pinctrl-10 = <&aud_pins_extamp_high>;
+	pinctrl-11 = <&aud_pins_extamp_low>;
 	status = "okay";
 };
 
@@ -422,46 +424,27 @@
 			pinmux = <PINMUX_GPIO20__FUNC_I2S3_DO>;
 		};
 	};
+
+	aud_pins_extamp_high: aud_pins_extamp_high {
+		pins_cmd_dat {
+			pinmux = <PINMUX_GPIO159__FUNC_GPIO159>;
+			slew-rate = <1>;
+			output-high;
+		};
+	};
+
+	aud_pins_extamp_low: aud_pins_extamp_low {
+		pins_cmd_dat {
+			pinmux = <PINMUX_GPIO159__FUNC_GPIO159>;
+			slew-rate = <1>;
+			output-low;
+		};
+	};
+
 };
 /* AUDIO end */
 
-&mt6370_pmu {
-	mt6370,intr_gpio_num = <11>; /* direct defined GPIO num */
-	mt6370,intr_gpio = <&pio 11 0x0>;
-};
 
-&mt6370_typec {
-	mt6370pd,intr_gpio_num = <41>; /* direct defined GPIO num */
-	mt6370pd,intr_gpio = <&pio 41 0x0>;
-};
-
-&charger {
-	algorithm_name = "DualSwitchCharging";
-	chg1_ta_ac_charger_current = <2000000>;
-	chg2_ta_ac_charger_current = <2000000>;
-};
-
-&i2c3 {
-	rt9465@4b {
-		compatible = "richtek,rt9465";
-		reg = <0x4b>;
-		status = "okay";
-		rt,en_gpio_num = <176>;
-		rt,en_gpio = <&pio 176 0x0>;
-		rt,intr_gpio_num = <23>; /* direct defined GPIO num */
-		rt,intr_gpio = <&pio 23 0x0>;
-		interrupt-names = "wdtmri";
-		charger_name = "secondary_chg";
-		ichg = <1500000>; /* uA */
-		mivr = <4500000>; /* uV */
-		cv = <4550000>; /* uV */
-		ieoc = <700000>; /* uA */
-		safety_timer = <12>; /* hour */
-		en_st; /* safety timer */
-		/* en_te; */
-		en_wdt;
-	};
-};
 
 &pio {
 	camera_pins_cam0_mclk_on: camera_pins_cam0_mclk_on {
@@ -622,14 +605,14 @@
 	};
 	camera_pins_cam_ldo_rear2_vcama_0: cam2@vcama0 {
 		pins_cmd_dat {
-			pinmux = <PINMUX_GPIO159__FUNC_GPIO159>;
+			pinmux = <PINMUX_GPIO153__FUNC_GPIO153>;
 			slew-rate = <1>;
 			output-low;
 		};
 	};
 	camera_pins_cam_ldo_rear2_vcama_1: cam2@vcama1 {
 		pins_cmd_dat {
-			pinmux = <PINMUX_GPIO159__FUNC_GPIO159>;
+			pinmux = <PINMUX_GPIO153__FUNC_GPIO153>;
 			slew-rate = <1>;
 			output-high;
 		};
@@ -700,4 +683,5 @@
 };
 
 #include <k65v1_64_bsp/cust.dtsi>
+#include "betterlife_fp_spi.dtsi"
 /*End of this file, DO NOT ADD ANYTHING HERE*/

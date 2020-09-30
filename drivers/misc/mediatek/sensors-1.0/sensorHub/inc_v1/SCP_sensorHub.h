@@ -200,7 +200,13 @@ typedef struct {
 } geofence_event_t;
 
 struct sar_event_t {
-	int32_t state;
+	struct {
+		int32_t data[3];
+		int32_t x_bias;
+		int32_t y_bias;
+		int32_t z_bias;
+	};
+	uint32_t status;
 };
 
 typedef enum {
@@ -428,20 +434,21 @@ typedef struct {
 
 struct mag_dev_info_t {
 	char libname[16];
-	int32_t layout;
-	int32_t deviceid;
+	int8_t layout;
+	int8_t deviceid;
 };
 
 struct sensorInfo_t {
-	union {
-		char name[16];
-		struct mag_dev_info_t mag_dev_info;
-	};
+	char name[16];
+	struct mag_dev_info_t mag_dev_info;
 };
 
 struct scp_sensor_hub_get_sensor_info {
 	CUST_ACTION action;
-	struct sensorInfo_t sensorInfo;
+	union {
+		int32_t int32_data[0];
+		struct sensorInfo_t sensorInfo;
+	};
 };
 
 enum {

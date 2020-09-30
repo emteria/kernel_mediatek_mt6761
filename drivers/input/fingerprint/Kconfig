@@ -16,7 +16,31 @@ if MTK_FINGERPRINT_SUPPORT
 config MTK_FINGERPRINT_SELECT
 	string "sensor type"
 	default "GF318M"
-
+	
+config CDFINGER_FP_REE
+	bool "cd Fingerprint"
+	default n
+	help
+	  cd Fingerprint	
+	
+config CDFINGER_FP_TEE
+	bool "cd Fingerprint"
+	default n
+	help
+	  cd Fingerprint
+	  
+config BETTERLIFE_FINGERPRINT
+    bool "betterlife Fingerprint"
+	default n
+	---help---
+	betterlife fingerprint.	  
+	
+config BETTERLIFE_FINGERPRINT_TEE
+    bool "betterlife Fingerprint tee"
+	default n
+	---help---
+	betterlife fingerprint.	  
+	
 
 if MTK_FINGERPRINT_SELECT = "FPC1145"
 config FPC_FINGERPRINT
@@ -29,7 +53,7 @@ endif
 if MTK_FINGERPRINT_SELECT = "GF318M" ||  MTK_FINGERPRINT_SELECT = "GF5216"
 config GOODIX_FINGERPRINT
 	bool "Goodix Fingerprint"
-	default y
+	default n
 	help
 	  Goodix Fingerprint chip GF316M/GF318M/GF3118M/GF518M/GF5118M/GF516M/GF816M/GF3208/GF3206/
 	  GF3266/GF3288/GF5206/GF5216/GF5208 TEE driver

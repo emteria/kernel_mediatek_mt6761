@@ -19,6 +19,7 @@
 #include <linux/device.h>
 #include <linux/pagemap.h>
 
+#define CONFIG_TRUSTY
 
 #ifdef CONFIG_TRUSTY
 #ifdef CONFIG_TRUSTY_INTERRUPT_MAP

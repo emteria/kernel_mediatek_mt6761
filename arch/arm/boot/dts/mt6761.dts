@@ -240,12 +240,6 @@ maxcpus=8 firmware_class.path=/vendor/firmware loop.max_part=7";
 		};
 
 #ifdef CONFIG_MICROTRUST_TEE_SUPPORT
-		soter-shared-mem {
-			compatible = "microtrust,shared_mem";
-			no-map;
-			size = <0 0x200000>;
-			alloc-ranges = <0 0x40000000 0 0x50000000>;
-		};
 #endif
 
 	};
@@ -2866,7 +2860,7 @@ mipi_rx_ana_csi0b: mipi_rx_ana_csi0b@11c11000 {
 		enable_anime;
 		enable_pe_plus;
 		power_path_support;
-		max_charger_voltage = <6500000>;
+		max_charger_voltage = <10000000>;
 		fast_charge_voltage = <3000000>;
 
 		/* charging current */
@@ -2874,7 +2868,7 @@ mipi_rx_ana_csi0b: mipi_rx_ana_csi0b@11c11000 {
 		ac_charger_current = <2050000>;
 		ac_charger_input_current = <3200000>;
 		non_std_ac_charger_current = <500000>;
-		charging_host_charger_current = <1500000>;
+		charging_host_charger_current = <500000>;
 		ta_ac_charger_current = <3000000>;
 		pd_charger_current = <500000>;
 
@@ -2897,7 +2891,7 @@ mipi_rx_ana_csi0b: mipi_rx_ana_csi0b@11c11000 {
 
 		/* common */
 		battery_cv = <4350000>;
-		max_charger_voltage = <6500000>;
+		max_charger_voltage = <10000000>;
 		min_charger_voltage = <4600000>;
 
 		/* charging current */
@@ -2907,8 +2901,8 @@ mipi_rx_ana_csi0b: mipi_rx_ana_csi0b@11c11000 {
 		usb_charger_current = <500000>;
 		ac_charger_current = <2050000>;
 		ac_charger_input_current = <3200000>;
-		non_std_ac_charger_current = <500000>;
-		charging_host_charger_current = <1500000>;
+		non_std_ac_charger_current = <2050000>;
+		charging_host_charger_current = <500000>;
 		apple_1_0a_charger_current = <650000>;
 		apple_2_1a_charger_current = <800000>;
 		ta_ac_charger_current = <3000000>;
@@ -2936,8 +2930,8 @@ mipi_rx_ana_csi0b: mipi_rx_ana_csi0b@11c11000 {
 		enable_min_charge_temp;
 		min_charge_temp = <0>;
 		min_charge_temp_plus_x_degree = <6>;
-		max_charge_temp = <50>;
-		max_charge_temp_minus_x_degree = <47>;
+		max_charge_temp = <60>;
+		max_charge_temp_minus_x_degree = <57>;
 
 		/* PE */
 		ta_12v_support;
@@ -2979,11 +2973,6 @@ mipi_rx_ana_csi0b: mipi_rx_ana_csi0b@11c11000 {
 		bif_threshold1 = <4250000>;
 		bif_threshold2 = <4300000>;
 		bif_cv_under_threshold2 = <4450000>;
-	};
-
-	rt9465_slave_chr: rt9465_slave_chr {
-		compatible = "richtek,rt9465";
-		status = "disabled";
 	};
 
 	rt-pd-manager {

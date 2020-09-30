@@ -16,7 +16,7 @@ bat_gm30: battery{
 	/*	Charging termination current.*/
 	DIFFERENCE_FULLOCV_ITH = <(200)>;
 	/*	If ui_soc shows 1% more than X minites, system will shutdown.*/
-	SHUTDOWN_1_TIME = <(5)>;
+	SHUTDOWN_1_TIME = <(15)>;
 /*	The ui_soc will keep 100% until SOC drop X percents after unplugged.*/
 	KEEP_100_PERCENT = <(1)>;
 	R_FG_VALUE = <(10)>;	/*	R_sense resistance.*/
@@ -26,7 +26,7 @@ bat_gm30: battery{
 	FG_METER_RESISTANCE = <(75)>;	/*	The resistance of PCB*/
 	/*	Tune value for current measurement.*/
 	CAR_TUNE_VALUE = <(100)>;
-	PMIC_MIN_VOL = <(33500)>;
+	PMIC_MIN_VOL = <(34000)>;
 	/*	vboot voltage for gauge 0%.*/
 	POWERON_SYSTEM_IBOOT = <(500)>;
 	/*	power on system iboot*/
@@ -43,12 +43,12 @@ bat_gm30: battery{
 	g_FG_PSEUDO100_T3 = <(100)>;	/*	Pseudo 100% percentage at T3.*/
 	g_FG_PSEUDO100_T4 = <(100)>;	/*	Pseudo 100% percentage at T4.*/
 	/*	System shut down voltage.*/
-	Q_MAX_SYS_VOLTAGE_BAT0 = <(3350)>;
+	Q_MAX_SYS_VOLTAGE_BAT0 = <(3400)>;
 	/*	System shut down voltage.*/
-	Q_MAX_SYS_VOLTAGE_BAT1 = <(3350)>;
+	Q_MAX_SYS_VOLTAGE_BAT1 = <(3400)>;
 	/*	System shut down voltage.*/
-	Q_MAX_SYS_VOLTAGE_BAT2 = <(3350)>;
+	Q_MAX_SYS_VOLTAGE_BAT2 = <(3400)>;
 	/*	System shut down voltage.*/
-	Q_MAX_SYS_VOLTAGE_BAT3 = <(3350)>;
+	Q_MAX_SYS_VOLTAGE_BAT3 = <(3400)>;
 #include "mt6761_battery_table_ext.dtsi"
 };

@@ -46,7 +46,10 @@ struct REGULATOR_CTRL regulator_control[REGULATOR_TYPE_MAX_NUM] = {
 	{"vcamio_main2"},
 	{"vcama_sub2"},
 	{"vcamd_sub2"},
-	{"vcamio_sub2"}
+	{"vcamio_sub2"},
+	{"vcama_main3"},
+	{"vcamd_main3"},
+	{"vcamio_main3"}
 };
 
 static struct REGULATOR reg_instance;
@@ -58,10 +61,12 @@ static void imgsensor_oc_handler1(void)
 		gimgsensor.status.oc);
 	gimgsensor.status.oc = 1;
 	aee_kernel_warning("Imgsensor OC", "Over current");
-	if (reg_instance.pid != -1)
-		force_sig(SIGTERM,
+	if (reg_instance.pid != -1 &&
+		pid_task(find_get_pid(reg_instance.pid), PIDTYPE_PID) != NULL)
+		force_sig(SIGKILL,
 				pid_task(find_get_pid(reg_instance.pid),
 						PIDTYPE_PID));
+
 }
 static void imgsensor_oc_handler2(void)
 {
@@ -70,7 +75,8 @@ static void imgsensor_oc_handler2(void)
 		gimgsensor.status.oc);
 	gimgsensor.status.oc = 1;
 	aee_kernel_warning("Imgsensor OC", "Over current");
-	if (reg_instance.pid != -1)
+	if (reg_instance.pid != -1 &&
+		pid_task(find_get_pid(reg_instance.pid), PIDTYPE_PID) != NULL)
 		force_sig(SIGKILL,
 				pid_task(find_get_pid(reg_instance.pid),
 						PIDTYPE_PID));
@@ -82,10 +88,12 @@ static void imgsensor_oc_handler3(void)
 		gimgsensor.status.oc);
 	gimgsensor.status.oc = 1;
 	aee_kernel_warning("Imgsensor OC", "Over current");
-	if (reg_instance.pid != -1)
+	if (reg_instance.pid != -1 &&
+		pid_task(find_get_pid(reg_instance.pid), PIDTYPE_PID) != NULL)
 		force_sig(SIGKILL,
 				pid_task(find_get_pid(reg_instance.pid),
 						PIDTYPE_PID));
+
 }
 
 
@@ -249,7 +257,9 @@ static enum IMGSENSOR_RETURN regulator_set(
 		? REGULATOR_TYPE_SUB_VCAMA
 		: (sensor_idx == IMGSENSOR_SENSOR_IDX_MAIN2)
 		? REGULATOR_TYPE_MAIN2_VCAMA
-		: REGULATOR_TYPE_SUB2_VCAMA;
+		: (sensor_idx == IMGSENSOR_SENSOR_IDX_SUB2)
+		? REGULATOR_TYPE_SUB2_VCAMA
+		: REGULATOR_TYPE_MAIN3_VCAMA;
 
 	pregulator =
 		preg->pregulator[reg_type_offset + pin - IMGSENSOR_HW_PIN_AVDD];

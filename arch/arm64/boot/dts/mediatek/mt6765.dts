@@ -298,12 +298,6 @@ firmware_class.path=/vendor/firmware loop.max_part=7";
 		};
 
 #ifdef CONFIG_MICROTRUST_TEE_SUPPORT
-		soter-shared-mem {
-			compatible = "microtrust,shared_mem";
-			no-map;
-			size = <0 0x200000>;
-			alloc-ranges = <0 0x40000000 0 0x50000000>;
-		};
 #endif
 
 	};
@@ -1210,7 +1204,7 @@ firmware_class.path=/vendor/firmware loop.max_part=7";
 			<&gce_mbox 3 0 CMDQ_THR_PRIO_4>,
 			<&gce_mbox 4 0 CMDQ_THR_PRIO_4>,
 			<&gce_mbox 5 0 CMDQ_THR_PRIO_4>,
-			<&gce_mbox 6 0 CMDQ_THR_PRIO_4>,
+			<&gce_mbox 6 400 CMDQ_THR_PRIO_3>,
 			<&gce_mbox 7 CMDQ_NO_TIMEOUT CMDQ_THR_PRIO_2>,
 #if defined(CONFIG_MTK_SEC_VIDEO_PATH_SUPPORT)
 			<&gce_mbox_svp 8 0 CMDQ_THR_PRIO_4>,
@@ -1600,6 +1594,13 @@ firmware_class.path=/vendor/firmware loop.max_part=7";
 			<&infracfg_ao CLK_IFR_AP_DMA>;
 		clock-names = "main", "dma";
 		clock-div = <5>;
+		scl-gpio-id = <83>;
+		sda-gpio-id = <82>;
+		gpio_start = <0x10002a00>;
+		mem_len = <0x200>;
+		eh_cfg = <0x20>;
+		pu_cfg = <0x50>;
+		rsel_cfg = <0x70>;
 		aed = <0x1a>;
 		mediatek,hs_only;
 	};
@@ -1614,6 +1615,13 @@ firmware_class.path=/vendor/firmware loop.max_part=7";
 			<&infracfg_ao CLK_IFR_AP_DMA>;
 		clock-names = "main", "dma";
 		clock-div = <5>;
+		scl-gpio-id = <84>;
+		sda-gpio-id = <81>;
+		gpio_start = <0x10002a00>;
+		mem_len = <0x200>;
+		eh_cfg = <0x20>;
+		pu_cfg = <0x50>;
+		rsel_cfg = <0x70>;
 		aed = <0x1a>;
 		mediatek,hs_only;
 	};
@@ -1628,6 +1636,13 @@ firmware_class.path=/vendor/firmware loop.max_part=7";
 			<&infracfg_ao CLK_IFR_AP_DMA>;
 		clock-names = "main", "dma";
 		clock-div = <5>;
+		scl-gpio-id = <103>;
+		sda-gpio-id = <104>;
+		gpio_start = <0x10002800>;
+		mem_len = <0x200>;
+		eh_cfg = <0x20>;
+		pu_cfg = <0x60>;
+		rsel_cfg = <0xa0>;
 		aed = <0x1a>;
 		ch_offset_default = <0x100>;
 		ch_offset_ccu = <0x200>;
@@ -1644,6 +1659,13 @@ firmware_class.path=/vendor/firmware loop.max_part=7";
 		<&infracfg_ao CLK_IFR_AP_DMA>;
 		clock-names = "main", "dma";
 		clock-div = <5>;
+		scl-gpio-id = <50>;
+		sda-gpio-id = <51>;
+		gpio_start = <0x10002600>;
+		mem_len = <0x200>;
+		eh_cfg = <0x20>;
+		pu_cfg = <0x90>;
+		rsel_cfg = <0xb0>;
 		aed = <0x1a>;
 		ch_offset_default = <0x100>;
 		mediatek,hs_only;
@@ -1659,6 +1681,13 @@ firmware_class.path=/vendor/firmware loop.max_part=7";
 			<&infracfg_ao CLK_IFR_AP_DMA>;
 		clock-names = "main", "dma";
 		clock-div = <5>;
+		scl-gpio-id = <105>;
+		sda-gpio-id = <106>;
+		gpio_start = <0x10002800>;
+		mem_len = <0x200>;
+		eh_cfg = <0x20>;
+		pu_cfg = <0x60>;
+		rsel_cfg = <0xa0>;
 		aed = <0x1a>;
 		ch_offset_default = <0x100>;
 		ch_offset_ccu = <0x200>;
@@ -1675,6 +1704,13 @@ firmware_class.path=/vendor/firmware loop.max_part=7";
 			<&infracfg_ao CLK_IFR_AP_DMA>;
 		clock-names = "main", "dma";
 		clock-div = <5>;
+		scl-gpio-id = <48>;
+		sda-gpio-id = <49>;
+		gpio_start = <0x10002600>;
+		mem_len = <0x200>;
+		eh_cfg = <0x20>;
+		pu_cfg = <0x90>;
+		rsel_cfg = <0xb0>;
 		aed = <0x1a>;
 		mediatek,hs_only;
 	};
@@ -1689,6 +1725,13 @@ firmware_class.path=/vendor/firmware loop.max_part=7";
 			<&infracfg_ao CLK_IFR_AP_DMA>;
 		clock-names = "main", "dma";
 		clock-div = <5>;
+		scl-gpio-id = <161>;
+		sda-gpio-id = <162>;
+		gpio_start = <0x10002c00>;
+		mem_len = <0x200>;
+		eh_cfg = <0x20>;
+		pu_cfg = <0x50>;
+		rsel_cfg = <0x70>;
 		aed = <0x1a>;
 		ch_offset_default = <0x100>;
 		ch_offset_ccu = <0x200>;
@@ -2095,6 +2138,12 @@ firmware_class.path=/vendor/firmware loop.max_part=7";
 				<&mmsys_config CLK_MM_IMG_DL_RELAY>,
 				<&mmsys_config CLK_MM_IMG_DL_ASYNC_TOP>;
 		clock-names = "CAM_MDP", "IMG_DL_RELAY", "IMG_DL_ASYNC_TOP";
+	};
+
+	otgvbus:otgvbus {
+		compatible = "mediatek,otg-vbus-gpio";
+		gpio-vbus-en = <175>;
+		gpio-vbus-en-std = <&pio 175 0x0>;
 	};
 
 	nfc:nfc {
@@ -2697,15 +2746,15 @@ firmware_class.path=/vendor/firmware loop.max_part=7";
 		enable_anime;
 		enable_pe_plus;
 		power_path_support;
-		max_charger_voltage = <6500000>;
+		max_charger_voltage = <10000000>;
 		fast_charge_voltage = <3000000>;
 
 		/* charging current */
 		usb_charger_current = <500000>;
-		ac_charger_current = <2050000>;
-		ac_charger_input_current = <3200000>;
-		non_std_ac_charger_current = <500000>;
-		charging_host_charger_current = <1500000>;
+		ac_charger_current = <1950000>;
+		ac_charger_input_current = <1950000>;
+		non_std_ac_charger_current = <700000>;
+		charging_host_charger_current = <500000>;
 		ta_ac_charger_current = <3000000>;
 		pd_charger_current = <500000>;
 
@@ -2727,8 +2776,8 @@ firmware_class.path=/vendor/firmware loop.max_part=7";
 		power_path_support;
 
 		/* common */
-		battery_cv = <4350000>;
-		max_charger_voltage = <6500000>;
+		battery_cv = <4400000>;
+		max_charger_voltage = <10000000>;
 		min_charger_voltage = <4600000>;
 
 		/* charging current */
@@ -2736,10 +2785,10 @@ firmware_class.path=/vendor/firmware loop.max_part=7";
 		usb_charger_current_unconfigured = <70000>;
 		usb_charger_current_configured = <500000>;
 		usb_charger_current = <500000>;
-		ac_charger_current = <2050000>;
-		ac_charger_input_current = <3200000>;
-		non_std_ac_charger_current = <500000>;
-		charging_host_charger_current = <1500000>;
+		ac_charger_current = <1950000>;
+		ac_charger_input_current = <1950000>;
+		non_std_ac_charger_current = <1100000>;
+		charging_host_charger_current = <500000>;
 		apple_1_0a_charger_current = <650000>;
 		apple_2_1a_charger_current = <800000>;
 		ta_ac_charger_current = <3000000>;
@@ -2767,8 +2816,8 @@ firmware_class.path=/vendor/firmware loop.max_part=7";
 		enable_min_charge_temp;
 		min_charge_temp = <0>;
 		min_charge_temp_plus_x_degree = <6>;
-		max_charge_temp = <50>;
-		max_charge_temp_minus_x_degree = <47>;
+		max_charge_temp = <60>;
+		max_charge_temp_minus_x_degree = <57>;
 
 		/* PE */
 		ta_12v_support;
@@ -2794,13 +2843,13 @@ firmware_class.path=/vendor/firmware loop.max_part=7";
 		pe40_stop_battery_soc = <80>;
 
 		/* PE 4.0 cable impedance (mohm) */
-		pe40_r_cable_1a_lower = <553>;
-		pe40_r_cable_2a_lower = <415>;
-		pe40_r_cable_3a_lower = <275>;
+		pe40_r_cable_1a_lower = <530>;
+		pe40_r_cable_2a_lower = <390>;
+		pe40_r_cable_3a_lower = <252>;
 
 		/* dual charger */
-		chg1_ta_ac_charger_current = <1500000>;
-		chg2_ta_ac_charger_current = <1500000>;
+		chg1_ta_ac_charger_current = <1000000>;
+		chg2_ta_ac_charger_current = <1000000>;
 
 		/* cable measurement impedance */
 		cable_imp_threshold = <699>;
@@ -3161,7 +3210,8 @@ firmware_class.path=/vendor/firmware loop.max_part=7";
 };
 
 #include "cust_mt6765_msdc.dtsi"
+#include "trusty.dtsi"
 #include "mt6357.dtsi"
 #include "mt6370.dtsi"
 #include "mt6370_pd.dtsi"
-
+#include  "betterlife_fp_platform_mtk.dtsi"

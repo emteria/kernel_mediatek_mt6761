@@ -398,6 +398,45 @@ static void scp_timeout_ws(struct work_struct *ws)
 	pr_notice("[SCP] scp_timeout_times=%x\n", scp_timeout_times);
 }
 
+
+#ifdef SCP_PARAMS_TO_SCP_SUPPORT
+/*
+ * Function/Space for kernel to pass static/initial parameters to scp's driver
+ * @return: 0 for success, positive for info and negtive for error
+ *
+ * Note: The function should be called before disabling 26M & resetting scp.
+ *
+ * An example of function instance of sensor_params_to_scp:
+ * int sensor_params_to_scp(phys_addr_t addr_vir, size_t size)
+ * {
+ *     int *params;
+ *
+ *     params = (int *)addr_vir;
+ *     params[0] = 0xaaaa;
+ *
+ *     return 0;
+ * }
+ */
+static int params_to_scp(void)
+{
+#ifdef CFG_SENSOR_PARAMS_TO_SCP_SUPPORT
+	int ret = 0;
+
+	mt_reg_sync_writel(scp_get_reserve_mem_phys(SCP_DRV_PARAMS_MEM_ID),
+			(SCP_TCM + SCP_REGION_INFO_OFFSET + OFF_PARAM_START));
+
+	ret = sensor_params_to_scp(
+		scp_get_reserve_mem_virt(SCP_DRV_PARAMS_MEM_ID),
+		scp_get_reserve_mem_size(SCP_DRV_PARAMS_MEM_ID));
+
+	return ret;
+#else
+	/* return success, if sensor_params_to_scp is not defined */
+	return 0;
+#endif
+}
+#endif
+
 /*
  * mark notify flag to 1 to notify apps to start their tasks
  */
@@ -1028,7 +1067,8 @@ static int scp_reserve_memory_ioremap(void)
 		accumlate_memory_size += scp_reserve_mblock[id].size;
 #ifdef DEBUG
 		pr_debug("[SCP] [%d] phys:0x%llx, virt:0x%llx, len:0x%llx\n",
-			id, (uint64_t)scp_reserve_mblock[id].start_phys,
+			id,
+			(uint64_t)scp_reserve_mblock[id].start_phys,
 			(uint64_t)scp_reserve_mblock[id].start_virt,
 			(uint64_t)scp_reserve_mblock[id].size);
 #endif  // DEBUG
@@ -1759,6 +1799,14 @@ static int __init scp_init(void)
 #endif
 
 	scp_recovery_init();
+
+#ifdef SCP_PARAMS_TO_SCP_SUPPORT
+	/* The function, sending parameters to scp must be anchored before
+	 * 1. disabling 26M, 2. resetting SCP
+	 */
+	if (params_to_scp() != 0)
+		goto err;
+#endif
 
 #if SCP_DVFS_INIT_ENABLE
 	wait_scp_dvfs_init_done();

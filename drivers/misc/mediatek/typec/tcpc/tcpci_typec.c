@@ -19,7 +19,8 @@
 #include "inc/tcpci.h"
 #include "inc/tcpci_typec.h"
 #include "inc/tcpci_timer.h"
-
+#include <linux/of_gpio.h>
+#include <linux/of.h>
 /* MTK only */
 #include <mt-plat/mtk_boot.h>
 
@@ -1953,6 +1954,8 @@ static inline bool typec_is_ignore_cc_change(
 	return false;
 }
 
+extern int otg_vbus_en_gpio;
+
 int tcpc_typec_handle_cc_change(struct tcpc_device *tcpc_dev)
 {
 	int ret;
@@ -1976,6 +1979,19 @@ int tcpc_typec_handle_cc_change(struct tcpc_device *tcpc_dev)
 #endif	/* CONFIG_TYPEC_CAP_NORP_SRC */
 
 	TYPEC_INFO("[CC_Alert] %d/%d\r\n", typec_get_cc1(), typec_get_cc2());
+
+	if( (typec_get_cc1() > 0 ) || (typec_get_cc2() > 0) )
+	{
+		printk("<1>""scj usb cc1 or cc2 insert\n");
+		gpio_direction_output(otg_vbus_en_gpio, 1);
+		gpio_set_value(otg_vbus_en_gpio, 1);	
+	}
+	else
+	{
+		printk("<1>""scj usb cc1 or cc2 not insert\n");
+		gpio_direction_output(otg_vbus_en_gpio, 0);
+		gpio_set_value(otg_vbus_en_gpio, 0);			
+	}
 
 	typec_disable_low_power_mode(tcpc_dev);
 

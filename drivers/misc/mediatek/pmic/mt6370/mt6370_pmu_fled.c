@@ -289,9 +289,13 @@ static int mt6370_fled_set_mode(struct rt_fled_dev *info,
 			break;
 		ret |= mt6370_pmu_reg_clr_bit(fi->chip,
 			MT6370_PMU_REG_FLEDEN, MT6370_STROBE_EN_MASK);
+		ret |= mt6370_pmu_reg_clr_bit(fi->chip,
+			MT6370_PMU_REG_FLEDEN, MT6370_FLEDCS_EN_MASK);
 		udelay(500);
-		ret |= mt6370_pmu_reg_set_bit(fi->chip, MT6370_PMU_REG_FLEDEN,
-				fi->id == MT6370_FLED1 ? 0x02 : 0x01);
+		//ret |= mt6370_pmu_reg_set_bit(fi->chip, MT6370_PMU_REG_FLEDEN,
+		//		fi->id == MT6370_FLED1 ? 0x02 : 0x01);
+		ret |= mt6370_pmu_reg_set_bit(fi->chip, 
+				MT6370_PMU_REG_FLEDEN, 0x02);	//only  use fled1
 		ret |= mt6370_pmu_reg_set_bit(fi->chip,
 				MT6370_PMU_REG_FLEDEN, MT6370_TORCH_EN_MASK);
 		udelay(500);
@@ -304,10 +308,14 @@ static int mt6370_fled_set_mode(struct rt_fled_dev *info,
 		break;
 	case FLASHLIGHT_MODE_FLASH:
 		ret = mt6370_pmu_reg_clr_bit(fi->chip,
-			MT6370_PMU_REG_FLEDEN, MT6370_STROBE_EN_MASK);
+			MT6370_PMU_REG_FLEDEN, MT6370_TORCH_EN_MASK);
+		ret = mt6370_pmu_reg_clr_bit(fi->chip,
+			MT6370_PMU_REG_FLEDEN, MT6370_FLEDCS_EN_MASK);
 		udelay(400);
-		ret |= mt6370_pmu_reg_set_bit(fi->chip, MT6370_PMU_REG_FLEDEN,
-			fi->id == MT6370_FLED1 ? 0x02 : 0x01);
+		//ret |= mt6370_pmu_reg_set_bit(fi->chip, MT6370_PMU_REG_FLEDEN,
+		//	fi->id == MT6370_FLED1 ? 0x02 : 0x01);
+		ret |= mt6370_pmu_reg_set_bit(fi->chip, 
+			MT6370_PMU_REG_FLEDEN, 0x02);	//only  use fled1
 		ret |= mt6370_pmu_reg_set_bit(fi->chip,
 			MT6370_PMU_REG_FLEDEN, MT6370_STROBE_EN_MASK);
 		mdelay(5);
@@ -407,6 +415,14 @@ static int mt6370_fled_set_torch_current_sel(struct rt_fled_dev *info,
 	struct mt6370_pmu_fled_data *fi = (struct mt6370_pmu_fled_data *)info;
 	int ret;
 
+	dev_info(fi->dev,  "%s level: %d\n", __func__, selector);
+
+	//max: 200ma
+	if (selector > 14)
+	{
+		selector = 14;
+	}
+
 	ret = mt6370_pmu_reg_update_bits(fi->chip, fi->fled_tor_cur_reg,
 			MT6370_FLED_TORCHCUR_MASK,
 			selector << MT6370_FLED_TORCHCUR_SHIFT);
@@ -419,6 +435,8 @@ static int mt6370_fled_set_strobe_current_sel(struct rt_fled_dev *info,
 {
 	struct mt6370_pmu_fled_data *fi = (struct mt6370_pmu_fled_data *)info;
 	int ret;
+
+	dev_info(fi->dev,  "%s level: %d\n", __func__, selector);
 
 	if (selector >= 256)
 		return -EINVAL;

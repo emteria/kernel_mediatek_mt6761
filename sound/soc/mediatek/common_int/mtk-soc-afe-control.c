@@ -575,14 +575,14 @@ void EnableAPLLTunerbySampleRate(unsigned int SampleRate)
 	if (GetApllbySampleRate(SampleRate) == Soc_Aud_APLL1) {
 		APLL1TunerCounter++;
 		if (APLL1TunerCounter == 1) {
-			Afe_Set_Reg(AFE_APLL1_TUNER_CFG, 0x00000832,
+			Afe_Set_Reg(AFE_APLL1_TUNER_CFG, 0x00000432,
 				    0x0000FFF7);
 			Afe_Set_Reg(AFE_APLL1_TUNER_CFG, 0x1, 0x1);
 		}
 	} else if (GetApllbySampleRate(SampleRate) == Soc_Aud_APLL2) {
 		APLL2TunerCounter++;
 		if (APLL2TunerCounter == 1) {
-			Afe_Set_Reg(AFE_APLL2_TUNER_CFG, 0x00000634,
+			Afe_Set_Reg(AFE_APLL2_TUNER_CFG, 0x00000434,
 				    0x0000FFF7);
 			Afe_Set_Reg(AFE_APLL2_TUNER_CFG, 0x1, 0x1);
 		}
@@ -1569,6 +1569,10 @@ bool SetI2SDacEnable(bool bEnable)
 		SetDLSrcEnable(false);
 		Afe_Set_Reg(AFE_I2S_CON1, bEnable, 0x1);
 		SetADDAEnable(false);
+
+		/* should delayed 1/fs(smallest is 8k) = 125us before afe off */
+		usleep_range(125, 150);
+
 #ifdef CONFIG_FPGA_EARLY_PORTING
 		pr_info("%s(), disable fpga clock divide by 4", __func__);
 		Afe_Set_Reg(FPGA_CFG0, 0x0 << 1, 0x1 << 1);

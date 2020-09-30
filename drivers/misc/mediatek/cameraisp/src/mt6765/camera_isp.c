@@ -4391,7 +4391,7 @@ static signed int ISP_WriteReg(struct ISP_REG_IO_STRUCT *pRegIo)
 		Ret = -EFAULT;
 		goto EXIT;
 	}
-	if (pRegIo->Count > 0xFFFFFFFF) {
+	if ((pRegIo->Count > 0xFFFFFFFF) || (pRegIo->Count == 0)) {
 		pr_err("pRegIo->Count error");
 		Ret = -EFAULT;
 		goto EXIT;
@@ -8033,17 +8033,35 @@ static long ISP_ioctl(struct file *pFile, unsigned int Cmd, unsigned long Param)
 
 	case ISP_TRANSFOR_CCU_REG:
 		{
-			uint64_t hwTickCnt, ccu_reg_trans_Time;
+			unsigned int hwTickCnt[2];
+			unsigned int globaltime[2];
+			unsigned long long reg_trans_Time;
+			unsigned long long sum;
 
-			if (copy_from_user(&hwTickCnt, (void *)Param,
-				sizeof(uint64_t)) == 0) {
-				ccu_reg_trans_Time =
-				archcounter_timesync_to_monotonic(hwTickCnt);
-				do_div(ccu_reg_trans_Time, 1000); /* ns to us */
+			if (copy_from_user(hwTickCnt, (void *)Param,
+				sizeof(unsigned int)*2) == 0) {
+
+				pr_debug("hwTickCnt[0]:%u , hwTickCnt[1]:%u",
+					hwTickCnt[0], hwTickCnt[1]);
+
+				sum =
+				(unsigned long long)hwTickCnt[0] +
+				((unsigned long long)hwTickCnt[1]<<32);
+
+				pr_debug("sum of hwTickCnt:%llu", sum);
+				reg_trans_Time =
+				archcounter_timesync_to_boot(sum);
+
+				globaltime[1] =
+				do_div(reg_trans_Time, 1000000000);
+				globaltime[1] = globaltime[1]/1000;
+				globaltime[0] = reg_trans_Time;
+				pr_debug("sec:%u , usec:%u",
+					globaltime[0], globaltime[1]);
 
 				if (copy_to_user((void *)Param,
-					&ccu_reg_trans_Time,
-					sizeof(uint64_t)) != 0) {
+					globaltime,
+					sizeof(unsigned int)*2) != 0) {
 					Ret = -EFAULT;
 				}
 			} else {
@@ -9088,6 +9106,12 @@ static long ISP_ioctl_compat(struct file *filp, unsigned int cmd,
 		}
 		ret = filp->f_op->unlocked_ioctl(filp, ISP_SET_MEM_INFO,
 			(unsigned long)data);
+		return ret;
+	}
+	case COMPAT_ISP_TRANSFOR_CCU_REG: {
+		ret =
+			filp->f_op->unlocked_ioctl(filp, ISP_TRANSFOR_CCU_REG,
+					   (unsigned long)compat_ptr(arg));
 		return ret;
 	}
 	case ISP_GET_DUMP_INFO:

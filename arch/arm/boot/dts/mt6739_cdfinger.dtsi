@@ -1,0 +1,88 @@
+/*add for cdfinger start*/
+&pio {
+	fps_reset_high: fps_reset_high {
+		pins_cmd_dat {
+			pinmux = <PINMUX_GPIO8__FUNC_GPIO8>;
+			slew-rate = <1>;
+			bias-disable;
+			output-high;
+		};
+	};
+	fps_reset_low: fps_reset_low {
+		pins_cmd_dat {
+			pinmux = <PINMUX_GPIO8__FUNC_GPIO8>;
+			slew-rate = <1>;
+			bias-disable;
+			output-low;
+		};
+	};
+
+	fps_spi_miso:fps_spi_miso@0{
+		pins_cmd_dat {
+			pinmux = <PINMUX_GPIO25__FUNC_SPI1_A_MI>;
+			slew-rate = <0>;
+			bias-pull-up = <11>;
+			output-low;
+		};
+	};
+	fps_spi_mosi:fps_spi_mosi@0{
+		pins_cmd_dat {
+			pinmux = <PINMUX_GPIO27__FUNC_SPI1_A_MO>;
+			slew-rate = <1>;
+			bias-pull-up = <11>;
+			output-low;
+		};
+	};
+	fps_spi_sck:fps_spi_sck@0{
+		pins_cmd_dat {
+			pinmux = <PINMUX_GPIO28__FUNC_SPI1_A_CLK>;
+			slew-rate = <1>;
+			bias-pull-up = <11>;
+			output-low;
+		};
+	};
+	fps_spi_cs:fps_spi_cs@0{
+		pins_cmd_dat {
+			pinmux = <PINMUX_GPIO26__FUNC_SPI1_A_CSB>;
+			slew-rate = <1>;
+			bias-pull-up = <11>;
+			output-low;
+		};
+	};
+	fps_irq: fps_irq {
+		pins_cmd_dat {
+			pinmux = <PINMUX_GPIO9__FUNC_GPIO9>;
+			slew-rate = <0>;
+			bias-disable;
+			output-low;
+		};
+	};
+};
+
+&cdfinger{
+	interrupt-parent = <&pio>;
+	interrupts = <9 IRQ_TYPE_EDGE_RISING 1 0>;
+			/*finger_pin = <&pio 15 0>;*/
+		reg = <0>;
+	vdd_ldo_enable = <0>;
+	vio_ldo_enable = <0>;
+	config_spi_pin = <1>;   
+spi-max-frequency = <8000000>;
+		
+	pinctrl-names = "finger_rst_high",
+		"finger_rst_low",
+		"spi_mi_low",
+		"spi_mo_low",
+		"spi_mclk_low",
+		"spi_cs_low",
+		"eint";
+	pinctrl-0 = <&fps_reset_high>;
+	pinctrl-1 = <&fps_reset_low>;
+	pinctrl-2 = <&fps_spi_miso>;
+	pinctrl-3 = <&fps_spi_mosi>;
+	pinctrl-4 = <&fps_spi_sck>;
+	pinctrl-5 = <&fps_spi_cs>;
+	pinctrl-6 = <&fps_irq>;
+	status = "okay";
+	};
+/*add for cdfinger end*/

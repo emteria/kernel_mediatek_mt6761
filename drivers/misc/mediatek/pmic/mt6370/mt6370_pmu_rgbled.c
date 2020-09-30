@@ -310,7 +310,7 @@ static int mt6370_pmu_led_blink_set(struct led_classdev *led_cdev,
 static struct mt6370_led_classdev mt6370_led_classdev[MT6370_PMU_MAXLED] = {
 	{
 		.led_dev =  {
-			.max_brightness = 6,
+			.max_brightness = 1,
 			.brightness_set = mt6370_pmu_led_bright_set,
 			.brightness_get = mt6370_pmu_led_bright_get,
 			.blink_set = mt6370_pmu_led_blink_set,
@@ -319,7 +319,7 @@ static struct mt6370_led_classdev mt6370_led_classdev[MT6370_PMU_MAXLED] = {
 	},
 	{
 		.led_dev =  {
-			.max_brightness = 6,
+			.max_brightness = 1,
 			.brightness_set = mt6370_pmu_led_bright_set,
 			.brightness_get = mt6370_pmu_led_bright_get,
 			.blink_set = mt6370_pmu_led_blink_set,
@@ -328,7 +328,7 @@ static struct mt6370_led_classdev mt6370_led_classdev[MT6370_PMU_MAXLED] = {
 	},
 	{
 		.led_dev =  {
-			.max_brightness = 6,
+			.max_brightness = 1,
 			.brightness_set = mt6370_pmu_led_bright_set,
 			.brightness_get = mt6370_pmu_led_bright_get,
 			.blink_set = mt6370_pmu_led_blink_set,
@@ -337,7 +337,7 @@ static struct mt6370_led_classdev mt6370_led_classdev[MT6370_PMU_MAXLED] = {
 	},
 	{
 		.led_dev =  {
-			.max_brightness = 3,
+			.max_brightness = 1,
 			.brightness_set = mt6370_pmu_led_bright_set,
 			.brightness_get = mt6370_pmu_led_bright_get,
 			.blink_set = mt6370_pmu_led_blink_set,

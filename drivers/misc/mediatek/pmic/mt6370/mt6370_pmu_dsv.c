@@ -181,7 +181,7 @@ static irqreturn_t mt6370_pmu_dsv_vpos_scp_irq_handler(int irq, void *data)
 	struct mt6370_pmu_dsv_data *dsv_data = data;
 	int ret;
 
-	pr_info("%s: IRQ triggered\n", __func__);
+	//pr_info("%s: IRQ triggered\n", __func__);
 	ret = mt6370_pmu_reg_read(dsv_data->chip, MT6370_PMU_REG_DBSTAT);
 	if (ret&0x80)
 		regulator_notifier_call_chain(

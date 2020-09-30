@@ -296,12 +296,6 @@ firmware_class.path=/vendor/firmware loop.max_part=7";
 		};
 
 #ifdef CONFIG_MICROTRUST_TEE_SUPPORT
-		soter-shared-mem {
-			compatible = "microtrust,shared_mem";
-			no-map;
-			size = <0 0x200000>;
-			alloc-ranges = <0 0x40000000 0 0x50000000>;
-		};
 #endif
 
 	};
@@ -659,6 +653,15 @@ firmware_class.path=/vendor/firmware loop.max_part=7";
 	goodix_fp: fingerprint {
 		compatible = "mediatek,goodix-fp";
 	};
+	/*add for cdfiger start*/
+
+	cdfinger:cdfinger {
+		compatible = "mediatek,fps1098";
+	};
+
+
+/*add for cdfiger end*/
+
 
 	mt6357_gauge {
 		compatible = "mediatek,mt6357_gauge";
@@ -2183,6 +2186,14 @@ firmware_class.path=/vendor/firmware loop.max_part=7";
 		interrupts = <GIC_SPI 255 IRQ_TYPE_LEVEL_LOW>;
 	};
 
+	dpe@15028000 {
+		compatible = "mediatek,dpe";
+		reg = <0 0x15028000 0 0x1000>;
+		interrupts = <GIC_SPI 256 IRQ_TYPE_LEVEL_LOW>;
+		clocks = <&imgsys CLK_IMG_DPE>;
+		clock-names = "DPE_CG_IMG_DPE";
+	};
+
 	smi_larb0: smi_larb0@14003000 {
 		cell-index = <0>;
 		compatible = "mediatek,smi_larb0", "mediatek,smi_larb";
@@ -2680,15 +2691,15 @@ firmware_class.path=/vendor/firmware loop.max_part=7";
 		enable_anime;
 		enable_pe_plus;
 		power_path_support;
-		max_charger_voltage = <6500000>;
+		max_charger_voltage = <10000000>;
 		fast_charge_voltage = <3000000>;
 
 		/* charging current */
 		usb_charger_current = <500000>;
-		ac_charger_current = <2050000>;
-		ac_charger_input_current = <3200000>;
+		ac_charger_current = <1950000>;
+		ac_charger_input_current = <1950000>;
 		non_std_ac_charger_current = <500000>;
-		charging_host_charger_current = <1500000>;
+		charging_host_charger_current = <500000>;
 		ta_ac_charger_current = <3000000>;
 		pd_charger_current = <500000>;
 
@@ -2710,8 +2721,8 @@ firmware_class.path=/vendor/firmware loop.max_part=7";
 		power_path_support;
 
 		/* common */
-		battery_cv = <4350000>;
-		max_charger_voltage = <6500000>;
+		battery_cv = <4400000>;
+		max_charger_voltage = <10000000>;
 		min_charger_voltage = <4600000>;
 
 		/* charging current */
@@ -2719,10 +2730,10 @@ firmware_class.path=/vendor/firmware loop.max_part=7";
 		usb_charger_current_unconfigured = <70000>;
 		usb_charger_current_configured = <500000>;
 		usb_charger_current = <500000>;
-		ac_charger_current = <2050000>;
-		ac_charger_input_current = <3200000>;
-		non_std_ac_charger_current = <500000>;
-		charging_host_charger_current = <1500000>;
+		ac_charger_current = <1950000>;
+		ac_charger_input_current = <1950000>;
+		non_std_ac_charger_current = <950000>;
+		charging_host_charger_current = <500000>;
 		apple_1_0a_charger_current = <650000>;
 		apple_2_1a_charger_current = <800000>;
 		ta_ac_charger_current = <3000000>;
@@ -2750,8 +2761,8 @@ firmware_class.path=/vendor/firmware loop.max_part=7";
 		enable_min_charge_temp;
 		min_charge_temp = <0>;
 		min_charge_temp_plus_x_degree = <6>;
-		max_charge_temp = <50>;
-		max_charge_temp_minus_x_degree = <47>;
+		max_charge_temp = <60>;
+		max_charge_temp_minus_x_degree = <57>;
 
 		/* PE */
 		ta_12v_support;
@@ -3106,7 +3117,8 @@ firmware_class.path=/vendor/firmware loop.max_part=7";
 };
 
 #include "cust_mt6765_msdc.dtsi"
+#include "trusty.dtsi"
 #include "mt6357.dtsi"
 #include "mt6370.dtsi"
 #include "mt6370_pd.dtsi"
-
+#include  <betterlife_fp_platform_mtk.dtsi>

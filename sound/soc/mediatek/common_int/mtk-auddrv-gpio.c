@@ -503,13 +503,13 @@ int AudDrv_GPIO_EXTAMP_Select(int bEnable, int mode)
 					aud_gpios[GPIO_EXTAMP_LOW].gpioctrl);
 				if (retval)
 					pr_info("could not set aud_gpios[GPIO_EXTAMP_LOW] pins\n");
-				udelay(2);
+				udelay(1);
 				retval = pinctrl_select_state(
 					pinctrlaud,
 					aud_gpios[GPIO_EXTAMP_HIGH].gpioctrl);
 				if (retval)
 					pr_info("could not set aud_gpios[GPIO_EXTAMP_HIGH] pins\n");
-				udelay(2);
+				udelay(1);
 			}
 		}
 	} else {

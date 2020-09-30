@@ -177,6 +177,8 @@ extern struct LCM_DRIVER hx8394a_hd720_dsi_vdo_tianma_v2_lcm_drv;
 extern struct LCM_DRIVER cpt_clap070wp03xg_lvds_lcm_drv;
 extern struct LCM_DRIVER hx8369_dsi_cmd_6571_lcm_drv;
 extern struct LCM_DRIVER hx8369_dsi_vdo_6571_lcm_drv;
+extern struct LCM_DRIVER hx8399_dsi_vdo_hd_lcm_drv;
+extern struct LCM_DRIVER hx8399_dsi_vdo_hd_wanxin_lcm_drv;
 extern struct LCM_DRIVER hx8369_dbi_6571_lcm_drv;
 extern struct LCM_DRIVER hx8369_dpi_6571_lcm_drv;
 extern struct LCM_DRIVER nt35510_dsi_cmd_6571_lcm_drv;
@@ -294,6 +296,7 @@ extern struct LCM_DRIVER nt36672_fhdp_dsi_vdo_auo_lcm_drv;
 extern struct LCM_DRIVER nt36672_fhdp_dsi_vdo_auo_laneswap_lcm_drv;
 extern struct LCM_DRIVER ili9881h_hdp_dsi_vdo_ilitek_rt5081_19_9_lcm_drv;
 extern struct LCM_DRIVER hx83112b_fhdp_dsi_cmd_auo_rt5081_lcm_drv;
+extern struct LCM_DRIVER ili9881_dsi_vdo_lm182_hd_lcm_drv;
 
 #ifdef BUILD_LK
 extern void mdelay(unsigned long msec);

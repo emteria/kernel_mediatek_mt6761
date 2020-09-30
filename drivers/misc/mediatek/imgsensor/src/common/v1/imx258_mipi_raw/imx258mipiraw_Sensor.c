@@ -63,6 +63,7 @@ static struct imgsensor_info_struct imgsensor_info = {
 	/* IMX258MIPI_SENSOR_ID, sensor_id = 0x2680*/
 	.sensor_id = IMX258_SENSOR_ID,
 
+	//modify by tsh for #29643 //0x16d8abef
 	.checksum_value = 0x38ebe79e, /* checksum value for Camera Auto Test */
 
 	.pre = {
@@ -236,7 +237,7 @@ static struct imgsensor_struct imgsensor = {
 	.dummy_line = 0,	/* current dummyline */
 
 	/* full size current fps : 24fps for PIP, 30fps for Normal or ZSD */
-	.current_fps = 300,
+	.current_fps = 30,
 	.autoflicker_en = KAL_FALSE,
 	.test_pattern = KAL_FALSE,
 
@@ -2703,7 +2704,9 @@ static kal_uint32 get_imgsensor_id(UINT32 *sensor_id)
 		do {
 			*sensor_id = return_sensor_id();
 			if (*sensor_id == imgsensor_info.sensor_id) {
-				pr_debug("i2c write id: 0x%x, sensor id: 0x%x\n",
+				printk("imx258 i2c write id: 0x%x, sensor id: 0x%x\n",
+					imgsensor.i2c_write_id, *sensor_id);
+				pr_debug("imx258 i2c write id: 0x%x, sensor id: 0x%x\n",
 					imgsensor.i2c_write_id, *sensor_id);
 #ifdef SLT_DEVINFO_CMM
 				s_DEVINFO_ccm->device_used = DEVINFO_USED;
@@ -2712,7 +2715,8 @@ static kal_uint32 get_imgsensor_id(UINT32 *sensor_id)
 				load_imx258_SPC_Data();
 				return ERROR_NONE;
 			}
-
+		      printk("imx258 Read sensor id fail, write id: 0x%x, id: 0x%x\n",
+				imgsensor.i2c_write_id, *sensor_id);
 		      pr_debug("Read sensor id fail, write id: 0x%x, id: 0x%x\n",
 				imgsensor.i2c_write_id, *sensor_id);
 
@@ -3913,6 +3917,10 @@ static kal_uint32 feature_control(MSDK_SENSOR_FEATURE_ENUM feature_id,
 			set_shutter(*feature_data);
 		streaming_control(KAL_TRUE);
 		break;
+
+
+
+
 	default:
 		break;
 	}

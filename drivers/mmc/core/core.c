@@ -468,7 +468,6 @@ int mmc_run_queue_thread(void *data)
 	struct mmc_request *done_mrq = NULL;
 	unsigned int task_id, areq_cnt_chk, tmo;
 	bool is_done = false;
-	bool io_boost_done = false;
 
 	int err;
 	u64 chk_time = 0;
@@ -480,10 +479,10 @@ int mmc_run_queue_thread(void *data)
 
 	pr_notice("[CQ] start cmdq thread\n");
 	mt_bio_queue_alloc(current, NULL);
-	while (1) {
 
-		mtk_io_boost_test_and_add_tid(current->pid,
-			&io_boost_done);
+	mtk_iobst_register_tid(current->pid);
+
+	while (1) {
 
 		set_current_state(TASK_RUNNING);
 		mt_biolog_cmdq_check();
@@ -1937,6 +1936,43 @@ int __mmc_claim_host(struct mmc_host *host, atomic_t *abort)
 EXPORT_SYMBOL(__mmc_claim_host);
 
 /**
+ *     mmc_try_claim_host - try exclusively to claim a host
+ *        and keep trying for given time, with a gap of 10ms
+ *     @host: mmc host to claim
+ *     @dealy_ms: delay in ms
+ *
+ *     Returns %1 if the host is claimed, %0 otherwise.
+ */
+int mmc_try_claim_host(struct mmc_host *host, unsigned int delay_ms)
+{
+	int claimed_host = 0;
+	unsigned long flags;
+	int retry_cnt = delay_ms/10;
+	bool pm = false;
+
+	do {
+		spin_lock_irqsave(&host->lock, flags);
+		if (!host->claimed || host->claimer == current) {
+			host->claimed = 1;
+			host->claimer = current;
+			host->claim_cnt += 1;
+			claimed_host = 1;
+			if (host->claim_cnt == 1)
+				pm = true;
+		}
+		spin_unlock_irqrestore(&host->lock, flags);
+		if (!claimed_host)
+			mmc_delay(10);
+	} while (!claimed_host && retry_cnt--);
+
+	if (pm)
+		pm_runtime_get_sync(mmc_dev(host));
+
+	return claimed_host;
+}
+EXPORT_SYMBOL(mmc_try_claim_host);
+
+/**
  *	mmc_release_host - release a host
  *	@host: mmc host to release
  *
@@ -2911,8 +2947,7 @@ void mmc_init_erase(struct mmc_card *card)
 		else if (sz < 1024)
 			card->pref_erase = 2 * 1024 * 1024 / 512;
 		else
-		/* workaround: enlarge 'pref_erase' to  speed up discard */
-			card->pref_erase = 128 * 1024 * 1024 / 512;
+			card->pref_erase = 4 * 1024 * 1024 / 512;
 
 		if (card->pref_erase < card->erase_size)
 			card->pref_erase = card->erase_size;
@@ -3423,6 +3458,9 @@ unsigned int mmc_calc_max_discard(struct mmc_card *card)
 {
 	struct mmc_host *host = card->host;
 	unsigned int max_discard, max_trim;
+
+	if (!host->max_busy_timeout)
+		return UINT_MAX;
 
 	/*
 	 * Without erase_group_def set, MMC erase timeout depends on clock

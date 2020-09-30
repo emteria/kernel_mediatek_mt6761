@@ -60,27 +60,29 @@ void tpd_get_dts_info(void)
 	int key_dim_local[16], i;
 
 	node1 = of_find_matching_node(node1, touch_of_match);
+	TPD_DMESG("tpd_get_dts_info\n");
 	if (node1) {
 		of_property_read_u32(node1,
 			"tpd-max-touch-num", &tpd_dts_data.touch_max_num);
 		of_property_read_u32(node1,
 			"use-tpd-button", &tpd_dts_data.use_tpd_button);
-		pr_debug("[tpd]use-tpd-button = %d\n",
+		TPD_DMESG("[tpd]use-tpd-button = %d\n",
 			tpd_dts_data.use_tpd_button);
 		if (of_property_read_u32_array(node1, "tpd-resolution",
 			tpd_dts_data.tpd_resolution,
 			ARRAY_SIZE(tpd_dts_data.tpd_resolution))) {
-			pr_debug("[tpd] resulution is %d %d",
+			TPD_DMESG("[tpd] resulution is %d %d",
 				tpd_dts_data.tpd_resolution[0],
 				tpd_dts_data.tpd_resolution[1]);
 		}
+		TPD_DMESG("[tpd] 111resulution is %d %d\n",tpd_dts_data.tpd_resolution[0],tpd_dts_data.tpd_resolution[1]);
 		if (tpd_dts_data.use_tpd_button) {
 			of_property_read_u32(node1,
 				"tpd-key-num", &tpd_dts_data.tpd_key_num);
 			if (of_property_read_u32_array(node1, "tpd-key-local",
 				tpd_dts_data.tpd_key_local,
 				ARRAY_SIZE(tpd_dts_data.tpd_key_local)))
-				pr_debug("tpd-key-local: %d %d %d %d",
+				TPD_DMESG("tpd-key-local: %d %d %d %d",
 					tpd_dts_data.tpd_key_local[0],
 					tpd_dts_data.tpd_key_local[1],
 					tpd_dts_data.tpd_key_local[2],
@@ -91,19 +93,19 @@ void tpd_get_dts_info(void)
 				memcpy(tpd_dts_data.tpd_key_dim_local,
 					key_dim_local, sizeof(key_dim_local));
 				for (i = 0; i < 4; i++) {
-					pr_debug("[tpd]key[%d].key_x = %d\n", i,
+					TPD_DMESG("[tpd]key[%d].key_x = %d\n", i,
 						tpd_dts_data
 							.tpd_key_dim_local[i]
 							.key_x);
-					pr_debug("[tpd]key[%d].key_y = %d\n", i,
+					TPD_DMESG("[tpd]key[%d].key_y = %d\n", i,
 						tpd_dts_data
 							.tpd_key_dim_local[i]
 							.key_y);
-					pr_debug("[tpd]key[%d].key_W = %d\n", i,
+					TPD_DMESG("[tpd]key[%d].key_W = %d\n", i,
 						tpd_dts_data
 							.tpd_key_dim_local[i]
 							.key_width);
-					pr_debug("[tpd]key[%d].key_H = %d\n", i,
+					TPD_DMESG("[tpd]key[%d].key_H = %d\n", i,
 						tpd_dts_data
 							.tpd_key_dim_local[i]
 							.key_height);
@@ -120,18 +122,18 @@ void tpd_get_dts_info(void)
 				"tpd-filter-custom-prameters",
 				(u32 *)tpd_dts_data.touch_filter.W_W,
 				ARRAY_SIZE(tpd_dts_data.touch_filter.W_W)))
-				pr_debug("get tpd-filter-custom-parameters");
+				TPD_DMESG("get tpd-filter-custom-parameters");
 			if (of_property_read_u32_array(node1,
 				"tpd-filter-custom-speed",
 				tpd_dts_data.touch_filter.VECLOCITY_THRESHOLD,
 				ARRAY_SIZE(tpd_dts_data
 						.touch_filter
 						.VECLOCITY_THRESHOLD)))
-				pr_debug("get tpd-filter-custom-speed");
+				TPD_DMESG("get tpd-filter-custom-speed");
 		}
 		memcpy(&tpd_filter,
 			&tpd_dts_data.touch_filter, sizeof(tpd_filter));
-		pr_debug("[tpd]tpd-filter-enable = %d, pixel_density = %d\n",
+		TPD_DMESG("[tpd]tpd-filter-enable = %d, pixel_density = %d\n",
 				tpd_filter.enable, tpd_filter.pixel_density);
 		tpd_dts_data.tpd_use_ext_gpio =
 			of_property_read_bool(node1, "tpd-use-ext-gpio");
@@ -148,7 +150,7 @@ static DEFINE_MUTEX(tpd_set_gpio_mutex);
 void tpd_gpio_as_int(int pin)
 {
 	mutex_lock(&tpd_set_gpio_mutex);
-	TPD_DEBUG("[tpd]tpd_gpio_as_int\n");
+	TPD_DEBUG("[tpd]tpd_gpio_as_int, pin: %d\n", pin);
 	if (pin == 1)
 		pinctrl_select_state(pinctrl1, eint_as_int);
 	mutex_unlock(&tpd_set_gpio_mutex);
@@ -202,18 +204,21 @@ int tpd_get_gpio_info(struct platform_device *pdev)
 		TPD_DMESG("Cannot find pinctrl state_eint_as_int!\n");
 		return ret;
 	}
+	TPD_DMESG("find pinctrl state_eint_as_int!\n");
 	eint_output0 = pinctrl_lookup_state(pinctrl1, "state_eint_output0");
 	if (IS_ERR(eint_output0)) {
 		ret = PTR_ERR(eint_output0);
 		TPD_DMESG("Cannot find pinctrl state_eint_output0!\n");
 		return ret;
 	}
+	TPD_DMESG("find pinctrl state_eint_output0!\n");
 	eint_output1 = pinctrl_lookup_state(pinctrl1, "state_eint_output1");
 	if (IS_ERR(eint_output1)) {
 		ret = PTR_ERR(eint_output1);
 		TPD_DMESG("Cannot find pinctrl state_eint_output1!\n");
 		return ret;
 	}
+	TPD_DMESG("find pinctrl state_eint_output1!\n");
 	if (tpd_dts_data.tpd_use_ext_gpio == false) {
 		rst_output0 =
 			pinctrl_lookup_state(pinctrl1, "state_rst_output0");
@@ -222,6 +227,7 @@ int tpd_get_gpio_info(struct platform_device *pdev)
 			TPD_DMESG("Cannot find pinctrl state_rst_output0!\n");
 			return ret;
 		}
+		TPD_DMESG("find pinctrl state_rst_output0!\n");
 		rst_output1 =
 			pinctrl_lookup_state(pinctrl1, "state_rst_output1");
 		if (IS_ERR(rst_output1)) {
@@ -607,7 +613,7 @@ static int tpd_probe(struct platform_device *pdev)
 		TPD_RES_X = 2048;
 	if (1600 == TPD_RES_Y)
 		TPD_RES_Y = 1536;
-	pr_debug("mtk_tpd: TPD_RES_X = %lu, TPD_RES_Y = %lu\n",
+	TPD_DMESG("mtk_tpd: TPD_RES_X = %lu, TPD_RES_Y = %lu\n",
 		TPD_RES_X, TPD_RES_Y);
 
 	tpd_mode = TPD_MODE_NORMAL;

@@ -116,6 +116,25 @@ static int initAF(void)
 	LOG_INF("+\n");
 
 	if (*g_pAF_Opened == 1) {
+#if 0
+		int i4RetValue = 0;
+	char puSendCmd[2] = {0x02, 0x01};
+	char puSendCmd2[2] = {0x02, 0x00};
+		g_pstAF_I2Cclient->addr = AF_I2C_SLAVE_ADDR;
+		g_pstAF_I2Cclient->addr = g_pstAF_I2Cclient->addr >> 1;
+		i4RetValue = i2c_master_send(g_pstAF_I2Cclient, puSendCmd, 2);
+
+		if (i4RetValue < 0) {
+			LOG_INF("I2C send 0x00 failed!!\n");
+			return -1;
+		}
+		i4RetValue = i2c_master_send(g_pstAF_I2Cclient, puSendCmd2, 2);
+
+		if (i4RetValue < 0) {
+			LOG_INF("I2C send 0x01 failed!!\n");
+			return -1;
+		}
+#endif
 
 		spin_lock(g_pAF_SpinLock);
 		*g_pAF_Opened = 2;
@@ -199,11 +218,74 @@ long DW9714AF_Ioctl(struct file *a_pstFile, unsigned int a_u4Command,
 /* Q1 : Try release multiple times. */
 int DW9714AF_Release(struct inode *a_pstInode, struct file *a_pstFile)
 {
-	LOG_INF("Start\n");
+	printk("zzzzz DW9714AF_Release Start\n");
 
 	if (*g_pAF_Opened == 2) {
+	int i4RetValue = 0;
+
+	char puSendCmd[2] = {0x02, 0x01};
+
+
+if (g_u4CurrPosition > 700) {
+			s4AF_WriteReg(700);
+			msleep(3);
+		}
+
+		if (g_u4CurrPosition > 600) {
+			s4AF_WriteReg(600);
+			msleep(3);
+		}
+
+		if (g_u4CurrPosition > 500) {
+			s4AF_WriteReg(500);
+			msleep(3);
+		}
+
+		if (g_u4CurrPosition > 400) {
+			s4AF_WriteReg(400);
+			msleep(3);
+		}
+
+		if (g_u4CurrPosition > 300) {
+			s4AF_WriteReg(300);
+			msleep(3);
+		}
+
+		if (g_u4CurrPosition > 270) {
+			s4AF_WriteReg(270);
+			msleep(3);
+		}
+
+		if (g_u4CurrPosition > 240) {
+			s4AF_WriteReg(240);
+			msleep(3);
+		}
+		
+		if (g_u4CurrPosition > 210) {
+			s4AF_WriteReg(210);
+			msleep(3);
+		}
+		if (g_u4CurrPosition > 190) {
+			s4AF_WriteReg(190);
+			msleep(3);
+		}
+		
+		if (g_u4CurrPosition > 170) {
+			s4AF_WriteReg(170);
+			msleep(3);
+		}
+if (g_u4CurrPosition > 150) {
+			s4AF_WriteReg(150);
+			msleep(3);
+		}
+
+
 		LOG_INF("Wait\n");
 		s4AF_WriteReg(0x80); /* Power down mode */
+		g_pstAF_I2Cclient->addr = AF_I2C_SLAVE_ADDR;
+		g_pstAF_I2Cclient->addr = g_pstAF_I2Cclient->addr >> 1;
+	i4RetValue = i2c_master_send(g_pstAF_I2Cclient, puSendCmd, 2);
+
 	}
 
 	if (*g_pAF_Opened) {

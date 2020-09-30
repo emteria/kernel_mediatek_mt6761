@@ -23,6 +23,8 @@
 #include <linux/platform_device.h>
 #include "musbhsdma.h"
 #include "usb20.h"
+#include <linux/of_gpio.h>
+#include <linux/of.h>
 #include <linux/of_irq.h>
 #include <linux/of_address.h>
 #ifdef CONFIG_MTK_USB_TYPEC
@@ -36,6 +38,13 @@ static struct delayed_work register_otg_work;
 static int otg_tcp_notifier_call(struct notifier_block *nb,
 		unsigned long event, void *data);
 #define TCPC_OTG_DEV_NAME "type_c_port0"
+
+#define USE_OTG_VBUS_EXT_GPIO
+unsigned int otg_vbus_en_gpio = 0;
+
+EXPORT_SYMBOL(otg_vbus_en_gpio);
+
+
 static void do_register_otg_work(struct work_struct *data)
 {
 #define REGISTER_OTG_WORK_DELAY 500
@@ -341,12 +350,20 @@ static int otg_tcp_notifier_call(struct notifier_block *nb,
 		if (noti->typec_state.old_state == TYPEC_UNATTACHED &&
 			noti->typec_state.new_state == TYPEC_ATTACHED_SRC) {
 			DBG(0, "OTG Plug in\n");
+			#if defined(USE_OTG_VBUS_EXT_GPIO)
+			gpio_set_value(otg_vbus_en_gpio, 1);
+			#endif
 			mt_usb_host_connect(0);
 		} else if ((noti->typec_state.old_state == TYPEC_ATTACHED_SRC ||
-			noti->typec_state.old_state == TYPEC_ATTACHED_SNK) &&
+			noti->typec_state.old_state == TYPEC_ATTACHED_SNK ||
+			noti->typec_state.old_state ==
+					TYPEC_ATTACHED_NORP_SRC) &&
 			noti->typec_state.new_state == TYPEC_UNATTACHED) {
 			if (is_host_active(mtk_musb)) {
 				DBG(0, "OTG Plug out\n");
+				#if defined(USE_OTG_VBUS_EXT_GPIO)
+				gpio_set_value(otg_vbus_en_gpio, 0);
+				#endif
 				mt_usb_host_disconnect(0);
 			} else {
 				DBG(0, "USB Plug out\n");
@@ -746,6 +763,10 @@ static int iddig_int_init(void)
 
 void mt_usb_otg_init(struct musb *musb)
 {
+#if defined(USE_OTG_VBUS_EXT_GPIO)
+	int r = 0;
+	struct device_node *np = musb->controller->of_node;
+#endif
 	/* BYPASS OTG function in special mode */
 	if (get_boot_mode() == META_BOOT
 #ifdef CONFIG_MTK_KERNEL_POWER_OFF_CHARGING
@@ -771,6 +792,45 @@ void mt_usb_otg_init(struct musb *musb)
 #ifdef CONFIG_MTK_USB_TYPEC
 	DBG(0, "host controlled by TYPEC\n");
 	typec_control = 1;
+
+#if defined(USE_OTG_VBUS_EXT_GPIO)
+		np = of_find_compatible_node(NULL, NULL, "mediatek,otg-vbus-gpio");
+
+		if (np) {
+#if (!defined(CONFIG_MTK_GPIO) || defined(CONFIG_MTK_GPIOLIB_STAND))
+			r = of_get_named_gpio(np, "gpio-vbus-en-std", 0);
+			if (r < 0)
+				DBG(0, "get otg vbus en GPIO failed\n");
+			else
+				otg_vbus_en_gpio = r;
+#else
+			of_property_read_u32_array(np, "gpio-vbus-en", &(pdata->reset_gpio), 1);
+#endif
+		} else {
+			DBG(0, "get gpio np err.\n");
+		}
+	/* handle optional vbus */
+	if (otg_vbus_en_gpio != 0) {
+		r = gpio_request(otg_vbus_en_gpio,
+#if (!defined(CONFIG_MTK_GPIO) || defined(CONFIG_MTK_GPIOLIB_STAND))
+				"gpio-vbus-en-std"
+#else
+				"gpio-vbus-en"
+#endif
+				);
+		if (r) {
+			DBG(0, "vbus gpio_request failed\n");
+		}
+		DBG(0, "EN GPIO = %d\n", otg_vbus_en_gpio);
+		r = gpio_direction_output(otg_vbus_en_gpio, 1);
+		if (r) {
+			DBG(0, "reset gpio_direction_output failed\n");
+		}
+		/* low active */
+		gpio_set_value(otg_vbus_en_gpio, 0);
+	}
+#endif
+
 #ifdef CONFIG_TCPC_CLASS
 	INIT_DELAYED_WORK(&register_otg_work, do_register_otg_work);
 	queue_delayed_work(mtk_musb->st_wq, &register_otg_work, 0);
@@ -791,6 +851,9 @@ void mt_usb_otg_exit(struct musb *musb)
 {
 	DBG(0, "OTG disable vbus\n");
 	mt_usb_set_vbus(mtk_musb, 0);
+	#if defined(USE_OTG_VBUS_EXT_GPIO)
+	//gpio_free(otg_vbus_en_gpio);
+	#endif
 }
 
 enum {

@@ -260,9 +260,14 @@ struct ccci_modem *ccci_md_alloc(int private_size)
 			"fail to allocate memory for modem structure\n");
 		goto out;
 	}
-	if (private_size > 0)
+	if (private_size > 0) {
 		md->private_data = kzalloc(private_size, GFP_KERNEL);
-	else
+		if (!md->private_data) {
+			CCCI_ERROR_LOG(-1, TAG,
+				"fail to allocate memory for modem private_data\n");
+			goto out;
+		}
+	} else
 		md->private_data = NULL;
 	md->per_md_data.config.setting |= MD_SETTING_FIRST_BOOT;
 	md->per_md_data.is_in_ee_dump = 0;
@@ -844,10 +849,11 @@ static void append_runtime_feature(char **p_rt_data,
 static unsigned int get_booting_start_id(struct ccci_modem *md)
 {
 	LOGGING_MODE mdlog_flag = MODE_IDLE;
+	u32 md_wait_time = 0;
 	u32 booting_start_id;
 
-	mdlog_flag = md->mdlg_mode;
-
+	mdlog_flag = md->mdlg_mode & 0x0000ffff;
+	md_wait_time = md->mdlg_mode >> 16;
 	if (md->per_md_data.md_boot_mode != MD_BOOT_MODE_INVALID) {
 		if (md->per_md_data.md_boot_mode == MD_BOOT_MODE_META)
 			booting_start_id = ((char)mdlog_flag << 8
@@ -871,6 +877,7 @@ static unsigned int get_booting_start_id(struct ccci_modem *md)
 			booting_start_id = ((char)mdlog_flag << 8
 							| NORMAL_BOOT_ID);
 	}
+	booting_start_id |= md_wait_time << 16;
 
 	CCCI_BOOTUP_LOG(md->index, TAG,
 		"get_booting_start_id 0x%x\n", booting_start_id);

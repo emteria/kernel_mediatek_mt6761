@@ -49,7 +49,7 @@ struct maghub_ipi_data {
 	struct data_unit_t m_data_t;
 	bool factory_enable;
 	bool android_enable;
-	struct mag_dev_info_t mag_dev_info;
+	struct sensorInfo_t mag_info;
 	struct completion selftest_done;
 };
 static int maghub_m_setPowerMode(bool enable)
@@ -111,20 +111,20 @@ static int maghub_ReadChipInfo(char *buf, int bufsize)
 
 static ssize_t show_chipinfo_value(struct device_driver *ddri, char *buf)
 {
-	char strbuf[MAGHUB_BUFSIZE];
+	char strbuf[MAGHUB_BUFSIZE] = {0};
 
 	maghub_ReadChipInfo(strbuf, MAGHUB_BUFSIZE);
-	return sprintf(buf, "%s\n", strbuf);
+	return snprintf(buf, PAGE_SIZE, "%s\n", strbuf);
 }
 static ssize_t show_sensordata_value(struct device_driver *ddri,
 	char *buf)
 {
-	char strbuf[MAGHUB_BUFSIZE];
+	char strbuf[MAGHUB_BUFSIZE] = {0};
 
 	maghub_m_setPowerMode(true);
 	msleep(20);
 	maghub_GetMData(strbuf, MAGHUB_BUFSIZE);
-	return sprintf(buf, "%s\n", strbuf);
+	return snprintf(buf, PAGE_SIZE, "%s\n", strbuf);
 }
 static ssize_t show_trace_value(struct device_driver *ddri, char *buf)
 {
@@ -273,18 +273,18 @@ static void scp_init_work_done(struct work_struct *work)
 		return;
 	}
 	if (atomic_xchg(&obj->first_ready_after_boot, 1) == 0) {
-
 		err = sensor_set_cmd_to_hub(ID_MAGNETIC,
-			CUST_ACTION_GET_SENSOR_INFO, &obj->mag_dev_info);
+			CUST_ACTION_GET_SENSOR_INFO, &obj->mag_info);
 		if (err < 0) {
 			pr_err("set_cmd_to_hub fail, (ID: %d),(action: %d)\n",
 				ID_MAGNETIC, CUST_ACTION_GET_SENSOR_INFO);
+			return;
 		}
 		strlcpy(mag_libinfo.libname,
-			obj->mag_dev_info.libname,
+			obj->mag_info.mag_dev_info.libname,
 			sizeof(mag_libinfo.libname));
-		mag_libinfo.layout = obj->mag_dev_info.layout;
-		mag_libinfo.deviceid = obj->mag_dev_info.deviceid;
+		mag_libinfo.layout = obj->mag_info.mag_dev_info.layout;
+		mag_libinfo.deviceid = obj->mag_info.mag_dev_info.deviceid;
 
 		err = mag_info_record(&mag_libinfo);
 		return;
@@ -488,9 +488,14 @@ static int maghub_factory_get_data(int32_t data[3], int *status)
 
 	/* get raw data */
 	err = maghub_get_data(&data[0], &data[1], &data[2], status);
-	data[0] = data[0] / CONVERT_M_DIV;
-	data[1] = data[1] / CONVERT_M_DIV;
-	data[2] = data[2] / CONVERT_M_DIV;
+	//modify mag sensor for factory by huangjq 2019.09.06
+	//data[0] = data[0] / CONVERT_M_DIV;
+	//data[1] = data[1] / CONVERT_M_DIV;
+	//data[2] = data[2] / CONVERT_M_DIV;
+	data[0] = data[0] / 1;
+	data[1] = data[1] / 1;
+	data[2] = data[2] / 1;
+	//end by huangjq
 
 	return err;
 }
@@ -524,7 +529,6 @@ static int maghub_factory_do_self_test(void)
 	if (ret < 0)
 		return -1;
 
-	init_completion(&obj->selftest_done);
 	ret = wait_for_completion_timeout(&obj->selftest_done,
 					  msecs_to_jiffies(3000));
 	if (!ret)
@@ -623,7 +627,7 @@ static int maghub_probe(struct platform_device *pdev)
 	maghub_init_flag = 1;
 	/*Mointor scp ready notify,
 	 *need monitor at the end of probe for two function:
-	 * 1.read mag_dev_info from sensorhub,
+	 * 1.read mag_info from sensorhub,
 	 * write to mag context
 	 * 2.set cali to sensorhub
 	 */
