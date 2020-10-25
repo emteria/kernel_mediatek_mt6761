@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--dct_version="2.5" buid_sn="161102" dws_modification_time="09.27.2019.17:59:44"-->
+<!--dct_version="2.5" buid_sn="161102" dws_modification_time="09.23.2020.09:38:12"-->
 <dct_cfg>
     <general chip="MT6765">
         <proj>Cervino</proj>
@@ -634,23 +634,23 @@
             </gpio49>
             <gpio50>
                 <eint_mode>false</eint_mode>
-                <def_mode>1</def_mode>
+                <def_mode>2</def_mode>
                 <inpull_en>true</inpull_en>
                 <inpull_selhigh>true</inpull_selhigh>
                 <def_dir>IN</def_dir>
                 <out_high>false</out_high>
-                <varName0>GPIO_I2C3_SCA_PIN</varName0>
+                <varName0>GPIO_UART_URXD1_PIN</varName0>
                 <smt>true</smt>
                 <ies>true</ies>
             </gpio50>
             <gpio51>
                 <eint_mode>false</eint_mode>
-                <def_mode>1</def_mode>
+                <def_mode>2</def_mode>
                 <inpull_en>true</inpull_en>
                 <inpull_selhigh>true</inpull_selhigh>
-                <def_dir>IN</def_dir>
+                <def_dir>OUT</def_dir>
                 <out_high>false</out_high>
-                <varName0>GPIO_I2C3_SDA_PIN</varName0>
+                <varName0>GPIO_UART_UTXD1_PIN</varName0>
                 <smt>true</smt>
                 <ies>true</ies>
             </gpio51>
@@ -1982,31 +1982,6 @@
                 <channel>I2C_CHANNEL_2</channel>
                 <address>0x18</address>
             </device6>
-            <device7>
-                <varName>SPEAKER_AMP</varName>
-                <channel>I2C_CHANNEL_3</channel>
-                <address>0x34</address>
-            </device7>
-            <device8>
-                <varName>SLAVE_CHARGER</varName>
-                <channel>I2C_CHANNEL_3</channel>
-                <address>0x4B</address>
-            </device8>
-            <device9>
-                <varName>NFC</varName>
-                <channel>I2C_CHANNEL_3</channel>
-                <address>0x08</address>
-            </device9>
-            <device10>
-                <varName>EXT_BUCK_LP4</varName>
-                <channel>I2C_CHANNEL_3</channel>
-                <address>0x57</address>
-            </device10>
-            <device11>
-                <varName>EXT_BUCK_LP4X</varName>
-                <channel>I2C_CHANNEL_3</channel>
-                <address>0x50</address>
-            </device11>
             <device12>
                 <varName>CAMERA_SUB</varName>
                 <channel>I2C_CHANNEL_4</channel>

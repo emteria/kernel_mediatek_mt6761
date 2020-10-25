@@ -212,7 +212,7 @@ void msdc_sd_power_switch(struct msdc_host *host, u32 on)
 				SHIFT_VMC_VOSEL_CAL);
 		}
 
-		msdc_ldo_power(on, host->mmc->supply.vqmmc, VOL_1800,
+		msdc_ldo_power(1, host->mmc->supply.vqmmc, VOL_1800,
 			&host->power_io);
 		msdc_set_tdsel(host, MSDC_TDRDSEL_1V8, 0);
 		msdc_set_rdsel(host, MSDC_TDRDSEL_1V8, 0);
@@ -268,7 +268,7 @@ void msdc_emmc_power(struct msdc_host *host, u32 on)
 		msdc_set_rdsel(host, MSDC_TDRDSEL_1V8, 0);
 	}
 
-	msdc_ldo_power(on, host->mmc->supply.vmmc,
+	msdc_ldo_power(1, host->mmc->supply.vmmc,
 		VOL_3000, &host->power_flash);
 #endif
 #ifdef MTK_MSDC_BRINGUP_DEBUG
@@ -294,7 +294,7 @@ void msdc_sd_power(struct msdc_host *host, u32 on)
 			pmic_enable_interrupt(INT_VMCH_OC, 0, "sdcard");
 
 		/* VMCH VOLSEL */
-		msdc_ldo_power(card_on, host->mmc->supply.vmmc, VOL_3000,
+		msdc_ldo_power(1, host->mmc->supply.vmmc, VOL_3000,
 			&host->power_flash);
 
 
@@ -311,7 +311,7 @@ void msdc_sd_power(struct msdc_host *host, u32 on)
 		pmic_config_interface(REG_VMC_VOSEL_CAL,
 			SD_VOL_ACTUAL - VOL_3000,
 			MASK_VMC_VOSEL_CAL, SHIFT_VMC_VOSEL_CAL);
-		msdc_ldo_power(on, host->mmc->supply.vqmmc, VOL_3000,
+		msdc_ldo_power(1, host->mmc->supply.vqmmc, VOL_3000,
 			&host->power_io);
 
 		if (on)
